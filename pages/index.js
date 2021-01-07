@@ -1,53 +1,67 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import Head from "next/head";
+import styles from "../styles/Home.module.css";
+import getCommerce from "../utils/commerce";
+import {
+  Grid,
+  Card,
+  CardMedia,
+  Link,
+  Slide,
+  CardActionArea,
+  CardContent,
+  Typography,
+  Box,
+} from "@material-ui/core";
 
-export default function Home() {
+export default function Home(props) {
+  const { products } = props;
+
   return (
     <div className={styles.container}>
       <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
+        <title>Cool Shop</title>
       </Head>
 
       <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
-
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
-
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/import?filter=next.js&utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
+        <Grid container spacing={1}>
+          {products.map((product) => (
+            <Slide key={product.id} direction="up" in={true}>
+              <Grid item md={3}>
+                <Card>
+                  <Link href={`/products/${product.permalink}`}>
+                    <CardActionArea>
+                      <CardMedia
+                        component="img"
+                        alt={product.name}
+                        image={product.media.source}
+                      />
+                      <CardContent>
+                        <Typography
+                          gutterBottom
+                          variant="body1"
+                          color="textPrimary"
+                          component="p"
+                        >
+                          {product.name}
+                        </Typography>
+                        <Box>
+                          <Typography
+                            gutterBottom
+                            variant="h6"
+                            color="error"
+                            component="h6"
+                          >
+                            {product.price.formatted_with_symbol}
+                          </Typography>
+                        </Box>
+                      </CardContent>
+                    </CardActionArea>
+                  </Link>
+                </Card>
+              </Grid>
+            </Slide>
+          ))}
+        </Grid>
       </main>
 
       <footer className={styles.footer}>
@@ -56,10 +70,20 @@ export default function Home() {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
+          Powered by TaiTD
         </a>
       </footer>
     </div>
-  )
+  );
+}
+
+export async function getStaticProps() {
+  const commerce = getCommerce();
+  const { data: products } = await commerce.products.list();
+
+  return {
+    props: {
+      products,
+    },
+  };
 }
